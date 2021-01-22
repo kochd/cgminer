@@ -258,6 +258,7 @@ static inline int fsync (int fd)
 	DRIVER_ADD_COMMAND(bitmineA1) \
 	DRIVER_ADD_COMMAND(blockerupter) \
 	DRIVER_ADD_COMMAND(cointerra) \
+	DRIVER_ADD_COMMAND(gekko) \
 	DRIVER_ADD_COMMAND(dragonmintT1) \
 	DRIVER_ADD_COMMAND(hashfast) \
 	DRIVER_ADD_COMMAND(drillbit) \
@@ -1029,7 +1030,6 @@ extern char *opt_icarus_options;
 extern char *opt_icarus_timing;
 extern float opt_anu_freq;
 extern float opt_au3_freq;
-extern float opt_compac_freq;
 extern int opt_au3_volt;
 extern float opt_rock_freq;
 #endif
@@ -1037,6 +1037,22 @@ extern bool opt_worktime;
 #ifdef USE_AVALON
 extern char *opt_avalon_options;
 extern char *opt_bitburner_fury_options;
+#endif
+#ifdef USE_GEKKO
+extern char *opt_gekko_serial;
+extern bool opt_gekko_boost;
+extern bool opt_gekko_gsc_detect;
+extern bool opt_gekko_gsd_detect;
+extern bool opt_gekko_gse_detect;
+extern bool opt_gekko_gsh_detect;
+extern float opt_gekko_gsc_freq;
+extern float opt_gekko_gsd_freq;
+extern float opt_gekko_gse_freq;
+extern int opt_gekko_gsh_freq;
+extern int opt_gekko_gsh_vcore;
+extern int opt_gekko_start_freq;
+extern int opt_gekko_step_freq;
+extern int opt_gekko_step_delay;
 #endif
 #ifdef USE_KLONDIKE
 extern char *opt_klondike_options;

@@ -1413,6 +1413,15 @@ void cgcond_time(struct timespec *abstime)
 	clock_gettime(CLOCK_REALTIME, abstime);
 }
 
+/* Get CLOCK_REALTIME for display purposes */
+void cgtime_real(struct timeval *tv)
+{
+	struct timespec tp;
+	clock_gettime(CLOCK_REALTIME, &tp);
+	tv->tv_sec = tp.tv_sec;
+	tv->tv_usec = tp.tv_nsec / 1000;
+}
+
 #ifdef WIN32
 /* Mingw32 has no strsep so create our own custom one  */
 
@@ -2235,6 +2244,11 @@ static bool configure_stratum_mining(struct pool *pool)
 	const char *key;
 	json_t *response, *value, *res_val, *err_val;
 	json_error_t err;
+
+#ifdef USE_GEKKO
+	if (!opt_gekko_boost)
+		return true;
+#endif
 
 	snprintf(s, RBUFSIZE,
 		 "{\"id\": %d, \"method\": \"mining.configure\", \"params\": "

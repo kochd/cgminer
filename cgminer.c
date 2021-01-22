@@ -128,6 +128,10 @@ char *curly = ":D";
 #include "driver-cointerra.h"
 #endif
 
+#ifdef USE_GEKKO
+#include "driver-gekko.h"
+#endif
+
 #ifdef USE_HASHFAST
 #include "driver-hashfast.h"
 #endif
@@ -249,7 +253,6 @@ char *opt_icarus_options = NULL;
 char *opt_icarus_timing = NULL;
 float opt_anu_freq = 250;
 float opt_au3_freq = 225;
-float opt_compac_freq = 150;
 int opt_au3_volt = 775;
 float opt_rock_freq = 270;
 #endif
@@ -290,6 +293,22 @@ static char *opt_set_avalonm_freq;
 #endif
 #ifdef USE_BLOCKERUPTER
 int opt_bet_clk = 0;
+#endif
+#ifdef USE_GEKKO
+char *opt_gekko_serial = NULL;
+bool opt_gekko_boost = 0;
+bool opt_gekko_gsc_detect = 0;
+bool opt_gekko_gsd_detect = 0;
+bool opt_gekko_gse_detect = 0;
+bool opt_gekko_gsh_detect = 0;
+float opt_gekko_gsc_freq = 150;
+float opt_gekko_gsd_freq = 100;
+float opt_gekko_gse_freq = 150;
+int opt_gekko_gsh_freq = 100;
+int opt_gekko_gsh_vcore = 400;
+int opt_gekko_start_freq = 100;
+int opt_gekko_step_freq = 25;
+int opt_gekko_step_delay = 15;
 #endif
 #ifdef USE_HASHRATIO
 #include "driver-hashratio.h"
@@ -1280,14 +1299,14 @@ static void load_temp_cutoffs()
 	}
 }
 
-static char *set_float_100_to_500(const char *arg, float *i)
+static char *set_float_0_to_500(const char *arg, float *i)
 {
 	char *err = opt_set_floatval(arg, i);
 
 	if (err)
 		return err;
 
-	if (*i < 100 || *i > 500)
+	if (*i < 0 || *i > 500)
 		return "Value out of range";
 
 	return NULL;
@@ -1869,6 +1888,50 @@ static struct opt_table opt_config_table[] = {
                      opt_set_intval, opt_show_intval, &opt_bet_clk,
                      "Set Block Erupter clock"),
 #endif
+#ifdef USE_GEKKO
+	OPT_WITH_ARG("--gekko-serial",
+			 opt_set_charp, NULL, &opt_gekko_serial,
+			 "Detect GekkoScience Device by Serial Number"),
+	OPT_WITHOUT_ARG("--gekko-compac-detect",
+			 opt_set_bool, &opt_gekko_gsc_detect,
+			 "Detect GekkoScience Compac BM1384"),
+	OPT_WITHOUT_ARG("--gekko-2pac-detect",
+			 opt_set_bool, &opt_gekko_gsd_detect,
+			 "Detect GekkoScience 2Pac BM1384"),
+	OPT_WITHOUT_ARG("--gekko-terminus-detect",
+			 opt_set_bool, &opt_gekko_gse_detect,
+			 "Detect GekkoScience Terminus BM1384"),
+	OPT_WITHOUT_ARG("--gekko-newpac-detect",
+			 opt_set_bool, &opt_gekko_gsh_detect,
+			 "Detect GekkoScience NewPac BM1387"),
+	OPT_WITHOUT_ARG("--gekko-newpac-boost",
+			 opt_set_bool, &opt_gekko_boost,
+			 "Enable GekkoScience NewPac AsicBoost"),
+	OPT_WITH_ARG("--gekko-terminus-freq",
+		     set_float_0_to_500, opt_show_floatval, &opt_gekko_gse_freq,
+		     "Set GekkoScience Terminus BM1384 frequency in MHz, range 6.25-500"),
+	OPT_WITH_ARG("--gekko-2pac-freq",
+		     set_float_0_to_500, opt_show_floatval, &opt_gekko_gsd_freq,
+		     "Set GekkoScience 2Pac BM1384 frequency in MHz, range 6.25-500"),
+	OPT_WITH_ARG("--gekko-compac-freq",
+		     set_float_0_to_500, opt_show_floatval, &opt_gekko_gsc_freq,
+		     "Set GekkoScience Compac BM1384 frequency in MHz, range 6.25-500"),
+	OPT_WITH_ARG("--gekko-newpac-freq",
+		     set_int_0_to_9999, opt_show_intval, &opt_gekko_gsh_freq,
+		     "Set GekkoScience NewPac BM1387 frequency in MHz, range 50-900"),
+	OPT_WITH_ARG("--gekko-newpac-vcore",
+		     set_int_0_to_9999, opt_show_intval, &opt_gekko_gsh_vcore,
+		     "Set GekkoScience NewPac BM1387 VCORE in mV, range 300-810"),
+	OPT_WITH_ARG("--gekko-start-freq",
+		     set_int_0_to_9999, opt_show_intval, &opt_gekko_start_freq,
+                     "Ramp start frequency MHz 25-500"),
+	OPT_WITH_ARG("--gekko-step-freq",
+		     set_int_0_to_9999, opt_show_intval, &opt_gekko_step_freq,
+		     "Ramp frequency step MHz 1-100"),
+	OPT_WITH_ARG("--gekko-step-delay",
+		     set_int_0_to_9999, opt_show_intval, &opt_gekko_step_delay,
+		     "Ramp step interval range 1-600"),
+#endif
 #ifdef HAVE_LIBCURL
 	OPT_WITH_ARG("--btc-address",
 		     opt_set_charp, NULL, &opt_btc_address,
@@ -1876,11 +1939,6 @@ static struct opt_table opt_config_table[] = {
 	OPT_WITH_ARG("--btc-sig",
 		     opt_set_charp, NULL, &opt_btc_sig,
 		     "Set signature to add to coinbase when solo mining (optional)"),
-#endif
-#ifdef USE_ICARUS
-	OPT_WITH_ARG("--compac-freq",
-		     set_float_100_to_500, &opt_show_floatval, &opt_compac_freq,
-		     "Set GekkoScience Compac frequency in MHz, range 100-500"),
 #endif
 #ifdef HAVE_CURSES
 	OPT_WITHOUT_ARG("--compact",
@@ -2500,6 +2558,9 @@ static char *opt_verusage_and_exit(const char *extra)
 #endif
 #ifdef USE_DRILLBIT
                 "drillbit "
+#endif
+#ifdef USE_GEKKO
+		"gekko "
 #endif
 #ifdef USE_HASHFAST
 		"hashfast "
@@ -4583,8 +4644,13 @@ static void kill_mining(void)
 		if (thr && PTH(thr) != 0L)
 			pth = &thr->pth;
 		thr_info_cancel(thr);
+#if !defined __MINGW32__ || __WINPTHREADS_VERSION >= 0x00050000
 		if (pth && *pth)
 			pthread_join(*pth, NULL);
+#else
+		if (pth && pth->p)
+			pthread_join(*pth, NULL);
+#endif
 	}
 }
 
@@ -5415,7 +5481,7 @@ static void set_curblock(const char *hexstr, const unsigned char *bedata)
 	int ofs;
 
 	cg_wlock(&ch_lock);
-	cgtime(&block_timeval);
+	cgtime_real(&block_timeval);
 	strcpy(current_hash, hexstr);
 	cg_memcpy(current_block, bedata, 32);
 	get_timestamp(blocktime, sizeof(blocktime), &block_timeval);
@@ -5830,9 +5896,9 @@ void write_config(FILE *fcfg)
 			}
 
 			if (opt->type & OPT_HASARG &&
-			    ((void *)opt->cb_arg == (void *)set_float_125_to_500 ||
-			     (void *)opt->cb_arg == (void *)set_float_100_to_250 ||
-			     (void *)opt->cb_arg == (void *)set_float_100_to_500)) {
+			    ((void *)opt->cb_arg == (void *)set_float_0_to_500 ||
+			     (void *)opt->cb_arg == (void *)set_float_125_to_500 ||
+			     (void *)opt->cb_arg == (void *)set_float_100_to_250)) {
 				fprintf(fcfg, ",\n\"%s\" : \"%.1f\"", p+2, *(float *)opt->u.arg);
 				continue;
 			}
@@ -10703,6 +10769,7 @@ begin_bench:
 		cgpu->rolling = cgpu->total_mhashes = 0;
 	}
 
+<<<<<<< HEAD
 #ifdef USE_BITMAIN_SOC
 	struct sysinfo sInfo;
 	if (sysinfo(&sInfo))
@@ -10718,10 +10785,14 @@ begin_bench:
 		total_tv_start_sys=sInfo.uptime;
 	}
 #endif
+=======
+	cgtime_real(&total_tv_start);
+	get_datestamp(datestamp, sizeof(datestamp), &total_tv_start);
+
+>>>>>>> 3339a51e136be269125a74ece852ae81201bd528
 	cgtime(&total_tv_start);
 	cgtime(&total_tv_end);
 	cgtime(&tv_hashmeter);
-	get_datestamp(datestamp, sizeof(datestamp), &total_tv_start);
 
 	watchpool_thr_id = 2;
 	thr = &control_thr[watchpool_thr_id];
@@ -10766,7 +10837,11 @@ begin_bench:
 	if (total_control_threads != 8)
 		early_quit(1, "incorrect total_control_threads (%d) should be 8", total_control_threads);
 
+#ifdef USE_GEKKO
+	set_lowprio();
+#else
 	set_highprio();
+#endif
 
 #ifdef USE_LIBSYSTEMD
 	sd_notify(false, "READY=1\n"
