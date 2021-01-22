@@ -10769,7 +10769,6 @@ begin_bench:
 		cgpu->rolling = cgpu->total_mhashes = 0;
 	}
 
-<<<<<<< HEAD
 #ifdef USE_BITMAIN_SOC
 	struct sysinfo sInfo;
 	if (sysinfo(&sInfo))
@@ -10785,12 +10784,10 @@ begin_bench:
 		total_tv_start_sys=sInfo.uptime;
 	}
 #endif
-=======
+
 	cgtime_real(&total_tv_start);
 	get_datestamp(datestamp, sizeof(datestamp), &total_tv_start);
 
->>>>>>> 3339a51e136be269125a74ece852ae81201bd528
-	cgtime(&total_tv_start);
 	cgtime(&total_tv_end);
 	cgtime(&tv_hashmeter);
 

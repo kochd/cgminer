@@ -83,12 +83,7 @@ case $target in
     ;;
 esac
 
-<<<<<<< HEAD
-=======
-#CFLAGS="$CFLAGS -Wimplicit-fallthrough=0"
-#^ causes problem on gcc 4.9 - pass in from CFLAG if needed
 
->>>>>>> 3339a51e136be269125a74ece852ae81201bd528
 case $target in
   *-*-linux-gnu*)
     have_linux=true
@@ -601,11 +596,7 @@ fi
 
 
 #Add a new device to this list if it needs libusb, along with a no on the end.
-<<<<<<< HEAD
-if test x$avalon$avalon2$avalon4$avalon7$avalon8$avalon_miner$bitforce$bitfury$blockerupter$modminer$bflsc$icarus$hashfast$hashratio$klondike$drillbit$cointerra$ants1$ants3 != xnonononononononononononononononononono; then
-=======
-if test x$avalon$avalon2$avalon4$avalon7$avalon_miner$bitforce$bitfury$blockerupter$gekko$modminer$bflsc$icarus$hashfast$hashratio$klondike$drillbit$cointerra$ants1$ants3 != xnonononononononononononononononononono; then
->>>>>>> 3339a51e136be269125a74ece852ae81201bd528
+if test x$avalon$avalon2$avalon4$avalon7$avalon8$avalon_miner$bitforce$bitfury$blockerupter$modminer$bflsc$icarus$hashfast$hashratio$klondike$drillbit$cointerra$ants1$ants3$gekko != xnononononononononononononononononononono; then
 	want_usbutils=true
 else
 	want_usbutils=false
@@ -617,11 +608,8 @@ else
 	want_libbitfury=false
 fi
 
-<<<<<<< HEAD
-if test x$avalon2$avalon4$avalon7$avalon8$avalon_miner$hashratio != xnononononono; then
-=======
-if test x$avalon2$avalon4$avalon7$avalon_miner$gekko$hashratio != xnononononono; then
->>>>>>> 3339a51e136be269125a74ece852ae81201bd528
+if test x$avalon2$avalon4$avalon7$avalon8$avalon_miner$hashratio$gekko != xnonononononono; then
+
 	want_crc16=true
 else
 	want_crc16=false
@@ -1012,11 +1000,7 @@ else
 fi
 
 #Add any new device to this, along with a no on the end of the test
-<<<<<<< HEAD
-if test "x$avalon$avalon2$avalon4$avalon7$avalon8$avalon_miner$bab$bflsc$bitforce$bitfury$bitfury16$bitmain_soc$blockerupter$hashfast$hashratio$icarus$klondike$knc$modminer$drillbit$minion$cointerra$bitmine_A1$ants1$ants2$ants3$sp10$sp30$dragonmint_t1" = xnononononononononononononononononononononononononononono; then
-=======
-if test "x$avalon$avalon2$avalon4$avalon7$avalon_miner$bab$bflsc$bitforce$bitfury$bitfury16$blockerupter$gekko$hashfast$hashratio$icarus$klondike$knc$modminer$drillbit$minion$cointerra$bitmine_A1$ants1$ants2$ants3$sp10$sp30$dragonmint_t1" = xnononononononononononononononononononononononononononono; then
->>>>>>> 3339a51e136be269125a74ece852ae81201bd528
+if test "x$avalon$avalon2$avalon4$avalon7$avalon8$avalon_miner$bab$bflsc$bitforce$bitfury$bitfury16$bitmain_soc$blockerupter$hashfast$hashratio$icarus$klondike$knc$modminer$drillbit$minion$cointerra$bitmine_A1$ants1$ants2$ants3$sp10$sp30$dragonmint_t1$gekko" = xnonononononononononononononononononononononononononononono; then
 	echo
 	AC_MSG_ERROR([No mining devices configured in])
 	echo
